@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Dictation Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="numberInput" class="large-text" placeholder="Type numbers separated by +...">
+        <button id="clearButton">Clear</button>
+        <button id="sumButton">+</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script>
+        const numberInput = document.getElementById('numberInput');
+        const clearButton = document.getElementById('clearButton');
+        const sumButton = document.getElementById('sumButton');
+
+        numberInput.addEventListener('keyup', function(event) {
+            if (event.key === '+') {
+                const numbers = numberInput.value.trim().split('+');
+                const lastNumber = numbers[numbers.length - 1];
+                if (!isNaN(lastNumber)) {
+                    speakNumber(lastNumber);
+                } else if (lastNumber !== '') {
+                    alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                }
+            }
+        });
+
+        numberInput.addEventListener('keydown', function(event) {
+            if (event.key === '+') {
+                const numbers = numberInput.value.trim().split('+');
+                const lastNumber = numbers[numbers.length - 1];
+                if (!isNaN(lastNumber)) {
+                    speakNumber(lastNumber);
+                } else if (lastNumber !== '') {
+                    alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                }
+            }
+        });
+
+        function speakNumber(number) {
+            const utterance = new SpeechSynthesisUtterance(number);
+            utterance.rate = 2.5; // Adjust the rate value to control speaking speed
+            speechSynthesis.speak(utterance);
+        }
+
+        function sumNumbers() {
+            const numbers = numberInput.value.trim().split('+');
+            let sum = 0;
+            for (const num of numbers) {
+                if (!isNaN(num)) {
+                    sum += Number(num);
+                } else {
+                    alert(`Invalid input: "${num}". Please enter a valid number.`);
+                    return;
+                }
+            }
+            numberInput.value = sum;
+            speakNumber(sum);
+        }
+
+        // Initialize annyang
+        if (annyang) {
+            const commands = {
+                'clear': function () {
+                    numberInput.value = '';
+                },
+                '+': function () {
+                    const numbers = numberInput.value.trim().split('+');
+                    const lastNumber = numbers[numbers.length - 1];
+                    if (!isNaN(lastNumber)) {
+                        speakNumber(lastNumber);
+                    } else if (lastNumber !== '') {
+                        alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                    }
+                },
+                'sum': sumNumbers
+            };
+
+            annyang.addCommands(commands);
+            annyang.start();
+        }
+
+        clearButton.addEventListener('click', function () {
+            numberInput.value = '';
+        });
+
+        sumButton.addEventListener('click', sumNumbers);
+    </script>
+    <style>
+        .large-text {
+            font-size: 36px; /* Adjust the font size as desired */
+            text-align: center;
+        }
+        /* ... (the rest of the CSS styles remain unchanged) ... */
+    </style>
+</body>
+</html>
