@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Dictation Calculator</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 30px;
+        }
+        .large-text {
+            font-size: 36px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 300px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100px;
+            height: 40px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="numberInput" class="large-text" placeholder="Digite os números separados por +...">
+        <button id="clearButton">Limpar</button>
+        <button id="sumButton">+</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script>
+        const numberInput = document.getElementById('numberInput');
+        const clearButton = document.getElementById('clearButton');
+        const sumButton = document.getElementById('sumButton');
+
+        numberInput.addEventListener('keyup', function(event) {
+            if (event.key === '+') {
+                const numbers = numberInput.value.trim().split('+');
+                const lastNumber = numbers[numbers.length - 1];
+                if (!isNaN(lastNumber)) {
+                    speakNumber(lastNumber);
+                } else if (lastNumber !== '') {
+                    alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                }
+            }
+        });
+
+        numberInput.addEventListener('keydown', function(event) {
+            if (event.key === '+') {
+                const numbers = numberInput.value.trim().split('+');
+                const lastNumber = numbers[numbers.length - 1];
+                if (!isNaN(lastNumber)) {
+                    speakNumber(lastNumber);
+                } else if (lastNumber !== '') {
+                    alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                }
+            }
+        });
+
+        function speakNumber(number) {
+            const utterance = new SpeechSynthesisUtterance(number);
+            utterance.rate = 3.0; // Ajuste o valor para controlar a velocidade da fala
+            speechSynthesis.speak(utterance);
+        }
+
+        function sumNumbers() {
+            const numbers = numberInput.value.trim().split('+');
+            let sum = 0;
+            for (const num of numbers) {
+                if (!isNaN(num)) {
+                    sum += Number(num);
+                } else {
+                    alert(`Invalid input: "${num}". Please enter a valid number.`);
+                    return;
+                }
+            }
+            numberInput.value = sum;
+            speakNumber(sum);
+        }
+
+        // Initialize annyang
+        if (annyang) {
+            const commands = {
+                'clear': function () {
+                    numberInput.value = '';
+                },
+                '+': function () {
+                    const numbers = numberInput.value.trim().split('+');
+                    const lastNumber = numbers[numbers.length - 1];
+                    if (!isNaN(lastNumber)) {
+                        speakNumber(lastNumber);
+                    } else if (lastNumber !== '') {
+                        alert(`Invalid input: "${lastNumber}". Please enter a valid number.`);
+                    }
+                },
+                'sum': sumNumbers
+            };
+
+            annyang.addCommands(commands);
+            annyang.start();
+        }
+
+        clearButton.addEventListener('click', function () {
+            numberInput.value = '';
+        });
+
+        sumButton.addEventListener('click', sumNumbers);
+    </script>
+</body>
+</html>
